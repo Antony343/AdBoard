@@ -9,6 +9,7 @@
         {% bootstrap_css %}
         <link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
         {% bootstrap_javascript jquery='slim' %}
+        <link rel="shortcut icon" type="image/png" href="{% static 'favicon.svg' %}"/>
     </head>
     <body class="container-fluid">
         <header class="mb-4">
@@ -16,24 +17,20 @@
         </header>
         <div class="row">
             <ul class="col nav justify-content-start border flex-row-reverse">
-{#            {% url 'main:register' %}#}
-                <li class="nav-item"><a class="nav-link" href="#">Регистрация</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'main:sign_up' %}">Регистрация</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-toggle="dropdown"
                     href="#" role="button" aria-haspopup="true"
                     aria-expanded="false">Профиль</a>
                     <div class="dropdown-menu">
-{#                        {% url 'main:profile_change' %}#}
-{#                        {% url 'main:password_change' %}#}
                         <a class="dropdown-item" href="{% url 'main:profile' %}">Мои объявления</a>
-                        <a class="dropdown-item" href="#">Изменить личные данные</a>
-                        <a class="dropdown-item" href="#">Изменить пароль</a>
+                        <a class="dropdown-item" href="{% url 'main:profile_update'%}">Изменить личные данные</a>
+                        <a class="dropdown-item" href="{% url 'password_reset' %}">Изменить пароль</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'logout' %}">Выйти</a>
                         <div class="dropdown-divider"></div>
-{#                        {% url 'main:profile_delete' %}#}
-                        <a class="dropdown-item" href="#">Удалить</a>
+                        <a class="dropdown-item" href="{% url 'main:profile_delete' %}">Удалить</a>
                     </div>
                 </li>
                 {% else %}
@@ -43,8 +40,7 @@
         </div>
         <div class="row">
             <nav class="col-md-auto nav flex-column border">
-{#            {% url 'main:index' %}#}
-                <a class="nav-link root" href="#">Главная</a>
+                <a class="nav-link root" href="{% url 'main:index' %}">Главная</a>
                 {% for rubric in rubrics %}
                 {% ifchanged rubric.super_rubric.pk %}
                 <span class="nav-link root font-weight-bold">{{ rubric.super_rubric.name }}</span>
