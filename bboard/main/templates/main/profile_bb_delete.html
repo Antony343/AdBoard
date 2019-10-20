@@ -1,11 +1,11 @@
 {% extends "layout/base.html" %}
 
-{% block content %}
-<h2>Последние 10 объявлений</h2>
+{% block title %}Удаление объявления - Профиль пользователя{% endblock %}
 
-    <div class="container-fluid mt-3">
-    {% for bb in bbs %}
-    <div class="row mt-5">
+{% block content %}
+<h2>Удаление объявления</h2>
+<div class="container-fluid mt-3">
+    <div class="row">
         {% if bb.image %}
         <div class="col-md-auto"><img src="{{ bb.image.url }}" class="main-image"></div>
         {% endif %}
@@ -17,6 +17,9 @@
             <p class="text-right font-italic">Объявление добавлено {{ bb.created_at }}</p>
         </div>
     </div>
-    {% endfor %}
 </div>
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Удалить">
+</form>
 {% endblock %}
