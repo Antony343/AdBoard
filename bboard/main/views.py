@@ -16,7 +16,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 from .forms import RegisterUserForm, BbForm, AIFormSet
-from .utilities import signer
+from .tasks import signer
 from .models import AdvUser, Bb, SubRubric
 from .forms import ChangeUserInfoForm, SearchForm
 # Create your views here.

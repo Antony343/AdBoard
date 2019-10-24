@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import Signal
-from .utilities import send_activation_notification
+from .tasks import send_activation_notification
 from django.dispatch import receiver
 
 # Create your models here.
@@ -10,7 +10,7 @@ user_registrated = Signal(providing_args=['instance'])
 
 @receiver(user_registrated)
 def user_registrated_dispatcher(sender, **kwargs):
-    send_activation_notification(kwargs['instance'])
+    send_activation_notification.delay(kwargs['instance'].pk)
 
 
 class AdvUser(AbstractUser):

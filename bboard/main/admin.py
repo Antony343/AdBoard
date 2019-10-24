@@ -2,18 +2,18 @@ from django.contrib import admin
 import datetime
 
 from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage
-from .utilities import send_activation_notification
+from .tasks import send_activation_notification
 from .forms import SubRubricForm
 
 
 def send_activation_notifications(modeladmin, request, queryset):
     for rec in queryset:
         if not rec.is_activated:
-            send_activation_notification(rec)
+            send_activation_notification.delay(rec.id)
     modeladmin.message_user(request, 'Письма с оповещениями отправлены')
 
 
-send_activation_notifications.short_description = 'Отправка писем с оповещениями об активации'
+# send_activation_notifications.short_description = 'Отправка писем с оповещениями об активации'
 
 
 class NonactivatedFilter(admin.SimpleListFilter):
