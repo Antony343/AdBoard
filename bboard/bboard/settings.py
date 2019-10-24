@@ -132,7 +132,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'knijniymir531@gmail.com'
 EMAIL_USE_TLS = True
 # Grant access to your account for unreliable apps firstly in gmail account settings
-EMAIL_HOST_PASSWORD = 'knyaztrue749'
+EMAIL_HOST_PASSWORD = '***'
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
