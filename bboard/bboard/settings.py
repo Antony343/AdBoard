@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'bootstrap4',
     'django_cleanup',
     'easy_thumbnails',
+    'django_extensions',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +134,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'knijniymir531@gmail.com'
 EMAIL_USE_TLS = True
 # Grant access to your account for unreliable apps firstly in gmail account settings
-EMAIL_HOST_PASSWORD = '***'
+EMAIL_HOST_PASSWORD = 'knyaztrue749'
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -154,4 +156,8 @@ REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT
+
+RECAPTCHA_PUBLIC_KEY = '6LdA4MEUAAAAADVM0KRFrqz3X3Ry8pSHQJzFyWTG'
+RECAPTCHA_PRIVATE_KEY = '6LdA4MEUAAAAANqIYopi_pQh7LYAbvTX1hGTCXEb'
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 

@@ -6,14 +6,18 @@ from .tasks import send_activation_notification
 from .forms import SubRubricForm
 
 
+# Here the action for admin site created then it can be used in ModelAdmin
+# modeladmin - current ModelAdmin selected by user
+# queryset - set of objects from ModelAdmin that user selected
 def send_activation_notifications(modeladmin, request, queryset):
     for rec in queryset:
         if not rec.is_activated:
+            # we use rec.id instead of rec because Celery serializes input data
             send_activation_notification.delay(rec.id)
     modeladmin.message_user(request, 'Письма с оповещениями отправлены')
 
 
-# send_activation_notifications.short_description = 'Отправка писем с оповещениями об активации'
+send_activation_notifications.short_description = 'Отправка писем с оповещениями об активации'
 
 
 class NonactivatedFilter(admin.SimpleListFilter):
@@ -41,13 +45,16 @@ class NonactivatedFilter(admin.SimpleListFilter):
 
 @admin.register(AdvUser)
 class AdvUserAdmin(admin.ModelAdmin):
+    # fields for list representation
     list_display = ('__str__', 'is_activated', 'date_joined')
     search_fields = ('username', 'email', 'first_name', 'last_name')
     list_filter = (NonactivatedFilter,)
+    # list of fields for detail representation
     fields = (('username', 'email'), ('first_name', 'last_name'),
               ('send_messages', 'is_active', 'is_activated'), ('is_staff', 'is_superuser'),
               'groups', 'user_permissions', ('last_login', 'date_joined'))
     readonly_fields = ('last_login', 'date_joined')
+    # register custom method for AdvUserAdmin
     actions = (send_activation_notifications,)
 
 

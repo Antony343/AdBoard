@@ -4,13 +4,21 @@ from django.dispatch import Signal
 from .tasks import send_activation_notification
 from django.dispatch import receiver
 
-# Create your models here.
+# created signal thst get one parameter 'instance'
 user_registrated = Signal(providing_args=['instance'])
 
 
+# create receiver for the user_registrated signal
 @receiver(user_registrated)
 def user_registrated_dispatcher(sender, **kwargs):
+    # Celery: call send_activation_notification with argument kwargs['instance'].pk
     send_activation_notification.delay(kwargs['instance'].pk)
+# This task will be handled by Celery!!!
+# form UserChangeView invoke signal with instance=user ->
+# this function gets pk of this instance and pass to send_activation function ->
+# then this send_activation function send email with Signed username that get with pk ->
+# then user click on link in activation email ->
+# from email View gets Signed username and after Unsigning checks both for equivalance
 
 
 class AdvUser(AbstractUser):
@@ -104,3 +112,16 @@ class AdditionalImage(models.Model):
     class Meta:
         verbose_name_plural = 'Дополнительные иллюстрации'
         verbose_name = 'Дополнительная иллюстрация'
+
+
+class Comment(models.Model):
+    bb = models.ForeignKey(Bb, on_delete=models.CASCADE, verbose_name='Объявление')
+    author = models.CharField(max_length=30, verbose_name='Автор')
+    content = models.TextField(verbose_name='Содержание')
+    is_active = models.BooleanField(default=True, db_index=True, verbose_name='Выводить на экран?')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликован')
+
+    class Meta:
+        verbose_name_plural = 'Комментарии'
+        verbose_name = 'Комментарий'
+        ordering = ['created_at']

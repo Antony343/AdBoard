@@ -6,6 +6,7 @@
 
 {% block content %}
     <h2>Удаление профиля - {{ advuser.username }}</h2>
+    {#    this will call post() method in DeleteUserView #}
     <form method="post">
         {% csrf_token %}
         {% buttons submit='Удалить' %}{% endbuttons %}

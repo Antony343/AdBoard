@@ -15,25 +15,28 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from .forms import RegisterUserForm, BbForm, AIFormSet
+from .forms import RegisterUserForm, BbForm, AIFormSet, ChangeUserInfoForm, SearchForm, UserCommentForm, GuestCommentForm
 from .tasks import signer
-from .models import AdvUser, Bb, SubRubric
-from .forms import ChangeUserInfoForm, SearchForm
+from .models import AdvUser, Bb, SubRubric, Comment
 # Create your views here.
 
 
 class Index(TemplateView):
+    template_name = 'main/index.html'
+
+    # bbs get latest 10 ads
     bbs = Bb.objects.filter(is_active=True)[:10]
 
+    # always add smths to context in CBV like this
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # Add in the bbs
+        # Add in context the bbs
         context['bbs'] = self.bbs
         return context
-    template_name = 'main/index.html'
 
 
+# creates and redirect to some static page, you can add context into template here or in main.middlewares
 def other_page(request, page):
     try:
         template = get_template('main/' + page + '.html')
@@ -42,12 +45,12 @@ def other_page(request, page):
     return HttpResponse(template.render(request=request))
 
 
+# push current user's ads into profile.html
 @login_required
 def profile(request):
     bbs = Bb.objects.filter(author=request.user.pk)
     context = {'bbs': bbs}
-    return render(request, 'main/profile.html', context)\
-
+    return render(request, 'main/profile.html', context)
 
 
 @login_required
@@ -116,6 +119,7 @@ class ChangeUserInfoView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('main:profile')
     success_message = 'Личные данные пользователя изменены'
 
+    # instead of dispatch and get_object methods you can simply send <int:pk> from url to this UpdateView
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.user.pk
         return super().dispatch(request, *args, **kwargs)
@@ -139,6 +143,7 @@ class SignUpDoneView(TemplateView):
 
 def user_activate(request, sign):
     try:
+        # signer imported from main/tasks.py
         username = signer.unsign(sign)
     except BadSignature:
         return render(request, 'main/bad_signature.html')
@@ -157,20 +162,24 @@ class DeleteUserView(LoginRequiredMixin, DeleteView):
     model = AdvUser
     success_url = reverse_lazy('main:index')
 
+    # gets current user id
     def dispatch(self, request, *args, **kwargs):
         self.user_id = request.user.pk
         return super().dispatch(request, *args, **kwargs)
 
+    # gets current user's object
+    def get_object(self, queryset=None):
+        if not queryset:
+            queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.user_id)
+
+    # this method will be called in template in form (method='post') after click on submit button
+# logout -> save message -> call parent post method -> thet it calls delete method -> delete() redirects to success_url
     def post(self, request, *args, **kwargs):
         logout(request)
         messages.add_message(request, messages.SUCCESS,
                              'Пользователь удален')
         return super().post(request, *args, **kwargs)
-
-    def get_object(self, queryset=None):
-        if not queryset:
-            queryset = self.get_queryset()
-        return get_object_or_404(queryset, pk=self.user_id)
 
 
 def by_rubric(request, pk):
@@ -196,5 +205,23 @@ def by_rubric(request, pk):
 def detail(request, rubric_pk, pk):
     bb = get_object_or_404(Bb, pk=pk)
     ais = bb.additionalimage_set.all()
-    context = {'bb': bb, 'ais': ais}
+    comments = Comment.objects.filter(bb=pk, is_active=True)
+    initial = {'bb': bb.pk}
+    if request.user.is_authenticated:
+        initial['author'] = request.user.username
+        form_class = UserCommentForm
+    else:
+        form_class = GuestCommentForm
+    form = form_class(initial=initial)
+    if request.method == 'POST':
+        c_form = form_class(request.POST)
+        if c_form.is_valid():
+            c_form.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Комментарий добавлен')
+        else:
+            form = c_form
+            messages.add_message(request, messages.WARNING,
+                                 'Комментарий не добавлен')
+    context = {'bb': bb, 'ais': ais, 'comments': comments, 'form': form}
     return render(request, 'main/detail.html', context)

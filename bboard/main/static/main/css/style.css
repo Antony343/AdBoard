@@ -11,3 +11,8 @@ img.main-image {
 img.additional-image {
     width: 180px;
 }
+
+/* move dropdown-menu to the left and lower*/
+div.dropdown-menu {
+     transform: translate3d(-120px, 38px, 0px) !important;
+}
