@@ -1,7 +1,7 @@
 from django.contrib import admin
 import datetime
 
-from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage
+from .models import AdvUser, SubRubric, SuperRubric, Bb, AdditionalImage, Comment
 from .tasks import send_activation_notification
 from .forms import SubRubricForm
 
@@ -83,3 +83,8 @@ class BbAdmin(admin.ModelAdmin):
     fields = (('rubric', 'author'), 'title', 'content', 'price',
               'contacts', 'image', 'is_active')
     inlines = (AdditionalImageInline, )
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    exclude = ('bb',)

@@ -1,0 +1,7 @@
+Уважаемый пользователь {{ instance.bb.author }}!
+
+Вы получили новый комментарий к объявлению "{{ instance.bb.title }}"
+
+{{ host }}{% url 'main:profile_bb_detail' pk=instance.bb.pk %}
+
+С уважением, администрация сайта "Доска объявлений".

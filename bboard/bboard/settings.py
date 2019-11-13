@@ -39,15 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
     'bootstrap4',
-    'django_cleanup',
-    'easy_thumbnails',
-    'django_extensions',
-    'captcha',
+    'django_cleanup',  # cleans deleted media files using post_delete
+    'easy_thumbnails',  # creates thumbnails for images
+    'django_extensions',  # shell_plus and other tools
+    'captcha',  # extends captchs functionality - Google recaptcha
+    'rest_framework',
+    'corsheaders',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -150,14 +154,18 @@ THUMBNAIL_ALIASES = {
 }
 THUMBNAIL_BASEDIR = 'thumbnails'
 
-
+# configs for redis and celery
 REDIS_HOST = 'localhost'
 REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT
 
+# configs for captcha
 RECAPTCHA_PUBLIC_KEY = '6LdA4MEUAAAAADVM0KRFrqz3X3Ry8pSHQJzFyWTG'
 RECAPTCHA_PRIVATE_KEY = '6LdA4MEUAAAAANqIYopi_pQh7LYAbvTX1hGTCXEb'
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
+# configs for rest functionality
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'

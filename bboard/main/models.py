@@ -121,7 +121,21 @@ class Comment(models.Model):
     is_active = models.BooleanField(default=True, db_index=True, verbose_name='Выводить на экран?')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликован')
 
+    def __str__(self):
+        return self.content[:20]
+
     class Meta:
         verbose_name_plural = 'Комментарии'
         verbose_name = 'Комментарий'
         ordering = ['created_at']
+
+
+from django.db.models.signals import post_save
+from .tasks import send_new_comment_notification
+
+
+# sends notification about new comment
+@receiver(post_save, sender=Comment)
+def add_comment_dispatcher(sender, instance, **kwargs):
+    if kwargs['created'] and instance.bb.author.send_messages:
+        send_new_comment_notification.delay(instance.pk)

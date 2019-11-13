@@ -30,6 +30,7 @@ urlpatterns = [
     path('main/', include('main.urls')),
     path('', RedirectView.as_view(url='/main/', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('api/', include('api.urls')),
 ]
 
 if settings.DEBUG:
